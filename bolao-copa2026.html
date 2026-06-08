@@ -202,6 +202,17 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .meu-palpite-res{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06);}
 .mp-score{font-size:13px;font-weight:700;color:var(--muted);}
 
+
+/* --- Esqueci Senha --- */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.8);}
+.modal-title{font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.4;}
+.link-btn{background:none;border:none;color:var(--green);font-size:13px;cursor:pointer;padding:6px 0;text-decoration:underline;display:block;width:100%;text-align:center;margin-top:8px;}
+.link-btn:hover{color:var(--gl);}
+.ok-box{color:var(--green);font-size:13px;text-align:center;background:rgba(26,102,54,.15);border-radius:10px;padding:9px 12px;display:none;margin-top:4px;}
+.ok-box.show{display:block;}
 </style>
 </head>
 <body>
@@ -289,6 +300,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       <div class="err-box" id="err-login"></div>
       <button class="btn mt8" onclick="doLogin()">Entrar no Bolão ⚽</button>
       <button class="btn btn-outline fs12" onclick="SS('regras')" style="padding:12px;">← Ver regras</button>
+      <button class="link-btn" onclick="abrirEsqueciSenha()">Esqueci minha senha?</button>
     </div>
     <div id="form-cad" style="display:none;flex-direction:column;gap:12px;">
       <div id="cs1" style="display:flex;flex-direction:column;gap:12px;">
@@ -312,6 +324,22 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   </div>
 </div>
 </div>
+</div>
+
+
+<!-- Modal Esqueci Senha -->
+<div class="modal-overlay" id="modal-esqueci">
+  <div class="modal-box">
+    <div class="modal-title">&#128273; Recuperar Senha</div>
+    <div class="modal-sub">Digite seu celular cadastrado e crie uma nova senha.</div>
+    <div><label class="inp-lbl">CELULAR</label><input class="inp" id="es-cel" type="tel" placeholder="(18) 99999-9999" oninput="this.value=this.value.replace(/\D/g,'')" maxlength="11"/></div>
+    <div style="margin-top:10px;"><label class="inp-lbl">NOVA SENHA</label><input class="inp" id="es-nova" type="password" placeholder="Nova senha (min. 4 caracteres)"/></div>
+    <div style="margin-top:10px;"><label class="inp-lbl">CONFIRMAR SENHA</label><input class="inp" id="es-conf" type="password" placeholder="Repita a nova senha" onkeydown="if(event.key==='Enter')doEsqueciSenha()"/></div>
+    <div class="err-box" id="err-esqueci"></div>
+    <div class="ok-box" id="ok-esqueci"></div>
+    <button class="btn mt8" onclick="doEsqueciSenha()">Salvar Nova Senha &#128274;</button>
+    <button class="btn btn-outline fs12" onclick="fecharEsqueciSenha()" style="padding:12px;margin-top:8px;">&#8592; Voltar</button>
+  </div>
 </div>
 
 <!-- APP -->
@@ -581,6 +609,39 @@ function setModo(m){
   document.getElementById("form-login").style.display=m==="login"?"flex":"none";
   document.getElementById("form-cad").style.display=m==="cad"?"flex":"none";
 }
+async function doEsqueciSenha(){
+  const cel = document.getElementById("es-cel").value.replace(/\D/g,"");
+  const nova = document.getElementById("es-nova").value;
+  const conf = document.getElementById("es-conf").value;
+  const err = document.getElementById("err-esqueci");
+  const ok = document.getElementById("ok-esqueci");
+  err.classList.remove("show"); ok.classList.remove("show");
+  if(!cel||!nova||!conf){err.textContent="Preencha todos os campos.";err.classList.add("show");return;}
+  if(cel.length<10){err.textContent="Celular invalido.";err.classList.add("show");return;}
+  if(nova.length<4){err.textContent="Senha deve ter ao menos 4 caracteres.";err.classList.add("show");return;}
+  if(nova!==conf){err.textContent="As senhas nao conferem.";err.classList.add("show");return;}
+  loading(true);
+  const{data,error}=await sb.from("participantes").select("id").eq("celular",cel).single();
+  if(error||!data){loading(false);err.textContent="Celular nao encontrado.";err.classList.add("show");return;}
+  const{error:upErr}=await sb.from("participantes").update({senha:nova}).eq("celular",cel);
+  loading(false);
+  if(upErr){err.textContent="Erro ao atualizar. Tente novamente.";err.classList.add("show");return;}
+  ok.textContent="\u2705 Senha atualizada! Faca login com a nova senha.";
+  ok.classList.add("show");
+  document.getElementById("es-cel").value="";
+  document.getElementById("es-nova").value="";
+  document.getElementById("es-conf").value="";
+  setTimeout(function(){fecharEsqueciSenha();},3000);
+}
+function abrirEsqueciSenha(){
+  document.getElementById("modal-esqueci").classList.add("show");
+  document.getElementById("err-esqueci").classList.remove("show");
+  document.getElementById("ok-esqueci").classList.remove("show");
+}
+function fecharEsqueciSenha(){
+  document.getElementById("modal-esqueci").classList.remove("show");
+}
+
 async function doLogin(){
   const cel=document.getElementById("l-cel").value.replace(/\D/g,"");
   const senha=document.getElementById("l-senha").value;
