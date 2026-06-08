@@ -1,0 +1,124 @@
+name: Atualizar Placares Copa 2026
+
+on:
+  schedule:
+    # Every 5 minutes during Copa 2026 (Jun 11 - Jul 19, 2026)
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  atualizar-placares:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Buscar e atualizar placares
+        env:
+          FD_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          SB_URL: ${{ secrets.SUPABASE_URL }}
+          SB_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python3 << 'PYEOF'
+          import urllib.request, json, os, sys
+          from datetime import datetime, timezone, timedelta
+
+          FD_KEY = os.environ.get('FD_API_KEY', '')
+          SB_URL = os.environ.get('SB_URL', '').rstrip('/')
+          SB_KEY = os.environ.get('SB_KEY', '')
+
+          if not FD_KEY or not SB_URL or not SB_KEY:
+              print("AVISO: Variaveis de ambiente nao configuradas. Configure os secrets no GitHub.")
+              sys.exit(0)
+
+          # Mapeamento: nome em ingles (football-data.org) -> ID do jogo no Bolao
+          # Formato: "MandanteEN|VisitanteEN": jogo_id
+          MAPA_JOGOS = {
+            "Mexico|South Africa": 1, "Canada|Colombia": 2, "USA|Brazil": 3,
+            "Argentina|Morocco": 4, "Australia|Turkey": 5, "Spain|Egypt": 6,
+            "Germany|Japan": 7, "France|Uruguay": 8, "Portugal|England": 9,
+            "Netherlands|Serbia": 10, "Belgium|Switzerland": 11, "Croatia|Ecuador": 12,
+            "Senegal|South Korea": 13, "Nigeria|Poland": 14, "Ghana|Czech Republic": 15,
+            "Cameroon|Saudi Arabia": 16, "Iran|IR": 17, "Ukraine|Algeria": 18,
+            "Hungary|Panama": 19, "Slovakia|Honduras": 20, "Romania|Costa Rica": 21,
+            "Austria|Venezuela": 22, "Wales|Ivory Coast": 23, "Scotland|Qatar": 24,
+            "Mexico|Colombia": 25, "Canada|Brazil": 26, "USA|Argentina": 27,
+            "South Africa|Morocco": 28, "Australia|Egypt": 29, "Turkey|Japan": 30,
+            "Spain|Germany": 31, "France|Portugal": 32, "England|Uruguay": 33,
+            "Netherlands|Belgium": 34, "Serbia|Switzerland": 35, "Croatia|Senegal": 36,
+            "Ecuador|Nigeria": 37, "Poland|South Korea": 38, "Ghana|Saudi Arabia": 39,
+            "Czech Republic|Cameroon": 40, "Algeria|Panama": 41, "Iran|Honduras": 42,
+            "Ukraine|Venezuela": 43, "Hungary|Costa Rica": 44, "Slovakia|Ivory Coast": 45,
+            "Romania|Qatar": 46, "Austria|Scotland": 47, "Wales|Wales": 48
+          }
+
+          # Buscar jogos de hoje e ontem
+          now = datetime.now(timezone.utc)
+          date_from = (now - timedelta(days=1)).strftime('%Y-%m-%d')
+          date_to = (now + timedelta(hours=3)).strftime('%Y-%m-%d')
+
+          url = f"https://api.football-data.org/v4/competitions/WC/matches?dateFrom={date_from}&dateTo={date_to}&season=2026"
+          req = urllib.request.Request(url, headers={"X-Auth-Token": FD_KEY})
+
+          try:
+              with urllib.request.urlopen(req, timeout=15) as r:
+                  data = json.loads(r.read())
+          except Exception as e:
+              print(f"ERRO ao buscar jogos: {e}")
+              sys.exit(1)
+
+          matches = data.get('matches', [])
+          print(f"Encontrados {len(matches)} jogos")
+
+          atualizados = 0
+          for match in matches:
+              status = match.get('status', '')
+              if status not in ('FINISHED', 'IN_PLAY', 'PAUSED'):
+                  continue
+
+              score = match.get('score', {})
+              ft = score.get('fullTime', {})
+              ht = score.get('halfTime', {})
+
+              gm = ft.get('home') if ft.get('home') is not None else ht.get('home')
+              gv = ft.get('away') if ft.get('away') is not None else ht.get('away')
+
+              if gm is None or gv is None:
+                  continue
+
+              home = match.get('homeTeam', {}).get('name', '')
+              away = match.get('awayTeam', {}).get('name', '')
+              chave = f"{home}|{away}"
+
+              jogo_id = MAPA_JOGOS.get(chave)
+              if not jogo_id:
+                  print(f"  Jogo nao mapeado: {chave}")
+                  continue
+
+              print(f"  Atualizando jogo {jogo_id}: {home} {gm}x{gv} {away} ({status})")
+
+              payload = json.dumps({
+                  "jogo_id": jogo_id,
+                  "gols_mandante": gm,
+                  "gols_visitante": gv
+              }).encode()
+
+              upsert_url = f"{SB_URL}/rest/v1/resultados"
+              req2 = urllib.request.Request(
+                  upsert_url,
+                  data=payload,
+                  headers={
+                      "apikey": SB_KEY,
+                      "Authorization": f"Bearer {SB_KEY}",
+                      "Content-Type": "application/json",
+                      "Prefer": "resolution=merge-duplicates"
+                  },
+                  method='POST'
+              )
+
+              try:
+                  with urllib.request.urlopen(req2, timeout=10) as r2:
+                      r2.read()
+                      atualizados += 1
+              except Exception as e:
+                  print(f"  ERRO ao atualizar: {e}")
+
+          print(f"Concluido! {atualizados} resultados atualizados.")
+          PYEOF
