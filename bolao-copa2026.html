@@ -965,5 +965,30 @@ window.onload=function(){
   SS("regras");
 };
 </script>
+<script>
+// Auto-refresh: reload data every 60s when there are live/blocked games
+var _refreshInterval = null;
+function iniciarAutoRefresh() {
+  if (_refreshInterval) clearInterval(_refreshInterval);
+  _refreshInterval = setInterval(async function() {
+    var temJogoAtivo = JOGOS.some(function(j) { return stJ(j) === "blo"; });
+    if (temJogoAtivo) {
+      await carregarTudo();
+      var abaAtual = document.querySelector(".aba-btn.active");
+      if (abaAtual) {
+        if (abaAtual.textContent.trim().includes("Palpites")) renderPalpites();
+        else if (abaAtual.textContent.trim().includes("Ranking")) renderRanking();
+        else if (abaAtual.textContent.trim().includes("Todos")) renderTodos();
+      }
+    }
+  }, 60000);
+}
+// Start auto-refresh when user logs in
+var _origCarregarTudo = carregarTudo;
+carregarTudo = async function() {
+  await _origCarregarTudo();
+  iniciarAutoRefresh();
+};
+</script>
 </body>
 </html>
