@@ -7,7 +7,7 @@
 <title>Bolão Copa 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <!-- SUPABASE SDK -->h
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/shupabase-js@2"></script>
 <style>
 :root{
   --bg:#04100a;--card:#0a1c10;--card2:#0d2214;
@@ -259,9 +259,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         <div class="fw7 txt-white fs13" style="margin-bottom:4px;">📊 Pontuação</div>
         <div style="display:flex;flex-direction:column;gap:4px;">
           <div class="row-between"><span class="txt-muted fs12">Placar exato</span><span class="fw7 txt-gold fs13">10 pts</span></div>
-          <div class="row-between"><span class="txt-muted fs12">Vencedor + mesma diferença</span><span class="fw7 txt-green fs13">7 pts</span></div>
-          <div class="row-between"><span class="txt-muted fs12">Vencedor + diferença errada</span><span class="fw7 fs13" style="color:#4fc3f7;">5 pts</span></div>
-          <div class="row-between"><span class="txt-muted fs12">Só o vencedor / empate certo</span><span class="fw7 txt-white fs13">3 pts</span></div>
+          <div class="row-between"><span class="txt-muted fs12">Vencedor + mesma diferença de gols</span><span class="fw7 txt-green fs13">7 pts</span></div>
+          <div class="row-between"><span class="txt-muted fs12">Vencedor/empate</span><span class="fw7 fs13" style="color:#4fc3f7;">5 pts</span></div>
           <div class="row-between"><span class="txt-muted fs12">Resultado errado</span><span class="fw7 txt-red fs13">0 pts</span></div>
         </div>
       </div>
@@ -525,7 +524,7 @@ function calcPts(pm,pv,gm,gv){
   const dp=pm-pv,dg=gm-gv;
   if(dp>0&&dg>0)return dp===dg?7:5;
   if(dp<0&&dg<0)return dp===dg?7:5;
-  if(dp===0&&dg===0)return 3;
+  if(dp===0&&dg===0)return 5;
   return 0;
 }
 function stJ(j){
