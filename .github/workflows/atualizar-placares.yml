@@ -2,7 +2,6 @@ name: Atualizar Placares Copa 2026
 
 on:
   schedule:
-    # Every 5 minutes during Copa 2026 (Jun 11 - Jul 19, 2026)
     - cron: '*/5 * * * *'
   workflow_dispatch:
 
@@ -25,36 +24,94 @@ jobs:
           SB_KEY = os.environ.get('SB_KEY', '')
 
           if not FD_KEY or not SB_URL or not SB_KEY:
-              print("AVISO: Variaveis de ambiente nao configuradas. Configure os secrets no GitHub.")
+              print("AVISO: Variaveis de ambiente nao configuradas.")
               sys.exit(0)
 
-          # Mapeamento: nome em ingles (football-data.org) -> ID do jogo no Bolao
-          # Formato: "MandanteEN|VisitanteEN": jogo_id
           MAPA_JOGOS = {
-            "Mexico|South Africa": 1, "Canada|Colombia": 2, "USA|Brazil": 3,
-            "Argentina|Morocco": 4, "Australia|Turkey": 5, "Spain|Egypt": 6,
-            "Germany|Japan": 7, "France|Uruguay": 8, "Portugal|England": 9,
-            "Netherlands|Serbia": 10, "Belgium|Switzerland": 11, "Croatia|Ecuador": 12,
-            "Senegal|South Korea": 13, "Nigeria|Poland": 14, "Ghana|Czech Republic": 15,
-            "Cameroon|Saudi Arabia": 16, "Iran|IR": 17, "Ukraine|Algeria": 18,
-            "Hungary|Panama": 19, "Slovakia|Honduras": 20, "Romania|Costa Rica": 21,
-            "Austria|Venezuela": 22, "Wales|Ivory Coast": 23, "Scotland|Qatar": 24,
-            "Mexico|Colombia": 25, "Canada|Brazil": 26, "USA|Argentina": 27,
-            "South Africa|Morocco": 28, "Australia|Egypt": 29, "Turkey|Japan": 30,
-            "Spain|Germany": 31, "France|Portugal": 32, "England|Uruguay": 33,
-            "Netherlands|Belgium": 34, "Serbia|Switzerland": 35, "Croatia|Senegal": 36,
-            "Ecuador|Nigeria": 37, "Poland|South Korea": 38, "Ghana|Saudi Arabia": 39,
-            "Czech Republic|Cameroon": 40, "Algeria|Panama": 41, "Iran|Honduras": 42,
-            "Ukraine|Venezuela": 43, "Hungary|Costa Rica": 44, "Slovakia|Ivory Coast": 45,
-            "Romania|Qatar": 46, "Austria|Scotland": 47, "Wales|Wales": 48
+            "Mexico|South Africa": 1,
+            "South Korea|Czechia": 2,
+            "Canada|Bosnia and Herzegovina": 3,
+            "United States|Paraguay": 4,
+            "Australia|Turkey": 5,
+            "Qatar|Switzerland": 6,
+            "Brazil|Morocco": 7,
+            "Haiti|Scotland": 8,
+            "Germany|Curacao": 9,
+            "Netherlands|Japan": 10,
+            "Ivory Coast|Ecuador": 11,
+            "Sweden|Tunisia": 12,
+            "Spain|Cape Verde": 13,
+            "Belgium|Egypt": 14,
+            "Saudi Arabia|Uruguay": 15,
+            "Iran|New Zealand": 16,
+            "Austria|Jordan": 17,
+            "France|Senegal": 18,
+            "Iraq|Norway": 19,
+            "Argentina|Algeria": 20,
+            "Portugal|Congo DR": 21,
+            "England|Croatia": 22,
+            "Ghana|Panama": 23,
+            "Uzbekistan|Colombia": 24,
+            "Czechia|South Africa": 25,
+            "Czech Republic|South Africa": 25,
+            "Switzerland|Bosnia and Herzegovina": 26,
+            "Canada|Qatar": 27,
+            "Mexico|South Korea": 28,
+            "Turkey|Paraguay": 29,
+            "United States|Australia": 30,
+            "Scotland|Morocco": 31,
+            "Brazil|Haiti": 32,
+            "Tunisia|Japan": 33,
+            "Netherlands|Sweden": 34,
+            "Germany|Ivory Coast": 35,
+            "Ecuador|Curacao": 36,
+            "Spain|Saudi Arabia": 37,
+            "Belgium|Iran": 38,
+            "Uruguay|Cape Verde": 39,
+            "New Zealand|Egypt": 40,
+            "Jordan|Algeria": 41,
+            "Argentina|Austria": 42,
+            "France|Iraq": 43,
+            "Norway|Senegal": 44,
+            "Portugal|Uzbekistan": 45,
+            "England|Ghana": 46,
+            "Panama|Croatia": 47,
+            "Colombia|Congo DR": 48,
+            "Switzerland|Canada": 49,
+            "Bosnia and Herzegovina|Qatar": 50,
+            "Scotland|Brazil": 51,
+            "Morocco|Haiti": 52,
+            "Czechia|Mexico": 53,
+            "Czech Republic|Mexico": 53,
+            "South Africa|South Korea": 54,
+            "Curacao|Ivory Coast": 55,
+            "Ecuador|Germany": 56,
+            "Japan|Sweden": 57,
+            "Tunisia|Netherlands": 58,
+            "Turkey|United States": 59,
+            "Paraguay|Australia": 60,
+            "Norway|France": 61,
+            "Senegal|Iraq": 62,
+            "Cape Verde|Saudi Arabia": 63,
+            "Uruguay|Spain": 64,
+            "Egypt|Iran": 65,
+            "New Zealand|Belgium": 66,
+            "Panama|England": 67,
+            "Croatia|Ghana": 68,
+            "Colombia|Portugal": 69,
+            "Congo DR|Uzbekistan": 70,
+            "Algeria|Austria": 71,
+            "Jordan|Argentina": 72
           }
 
-          # Buscar jogos de hoje e ontem
           now = datetime.now(timezone.utc)
           date_from = (now - timedelta(days=1)).strftime('%Y-%m-%d')
           date_to = (now + timedelta(hours=3)).strftime('%Y-%m-%d')
 
-          url = f"https://api.football-data.org/v4/competitions/WC/matches?dateFrom={date_from}&dateTo={date_to}&season=2026"
+          url = (
+              f"https://api.football-data.org/v4/competitions/WC/matches"
+              f"?dateFrom={date_from}&dateTo={date_to}&status=FINISHED"
+          )
           req = urllib.request.Request(url, headers={"X-Auth-Token": FD_KEY})
 
           try:
@@ -70,13 +127,12 @@ jobs:
           atualizados = 0
           for match in matches:
               status = match.get('status', '')
-              if status not in ('FINISHED', 'IN_PLAY', 'PAUSED'):
+              if status != 'FINISHED':
                   continue
 
               score = match.get('score', {})
               ft = score.get('fullTime', {})
               ht = score.get('halfTime', {})
-
               gm = ft.get('home') if ft.get('home') is not None else ht.get('home')
               gv = ft.get('away') if ft.get('away') is not None else ht.get('away')
 
@@ -101,6 +157,7 @@ jobs:
               }).encode()
 
               upsert_url = f"{SB_URL}/rest/v1/resultados"
+
               req2 = urllib.request.Request(
                   upsert_url,
                   data=payload,
@@ -108,15 +165,36 @@ jobs:
                       "apikey": SB_KEY,
                       "Authorization": f"Bearer {SB_KEY}",
                       "Content-Type": "application/json",
-                      "Prefer": "resolution=merge-duplicates"
+                      "Prefer": "resolution=merge-duplicates,return=minimal"
                   },
                   method='POST'
               )
-
               try:
                   with urllib.request.urlopen(req2, timeout=10) as r2:
                       r2.read()
                       atualizados += 1
+              except urllib.error.HTTPError as e:
+                  if e.code == 409:
+                      patch_url = f"{SB_URL}/rest/v1/resultados?jogo_id=eq.{jogo_id}"
+                      req3 = urllib.request.Request(
+                          patch_url,
+                          data=payload,
+                          headers={
+                              "apikey": SB_KEY,
+                              "Authorization": f"Bearer {SB_KEY}",
+                              "Content-Type": "application/json",
+                              "Prefer": "return=minimal"
+                          },
+                          method='PATCH'
+                      )
+                      try:
+                          with urllib.request.urlopen(req3, timeout=10) as r3:
+                              r3.read()
+                              atualizados += 1
+                      except Exception as e3:
+                          print(f"  ERRO no PATCH: {e3}")
+                  else:
+                      print(f"  ERRO ao atualizar: {e}")
               except Exception as e:
                   print(f"  ERRO ao atualizar: {e}")
 
