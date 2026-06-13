@@ -739,7 +739,7 @@ function goAba(a){
 // ══════════════════════════════
 // PALPITES
 // ══════════════════════════════
-async function salvarPalpite(id){
+async function salvarPalpite(id){  const _jogo=JOGOS.find(j=>j.id===id);  if(_jogo&&new Date()>=new Date(_jogo.dt)){toast('⛔ Palpites bloqueados. O jogo já começou.',false);return;}  const _jogo=JOGOS.find(j=>j.id===id);
   const pm=document.getElementById("pm-"+id)?.value;
   const pv=document.getElementById("pv-"+id)?.value;
   if(pm===""||pv===""||pm==null||pv==null){toast("⚠ Preencha o placar dos dois times",false);return;}
