@@ -1010,23 +1010,11 @@ function compartilharPerfil(){
   const minha=posIdx>=0?ranking[posIdx]:{pts:0,pal:0,ex:0};
   const pos=posIdx>=0?posIdx+1:'-';
   const total=ranking.length;
-  const txt='🏆 Bolão Copa 2026
-
-'+
-    '👤 '+u.nome+'
-'+
-    '🏅 '+pos+'º lugar de '+total+'
-'+
-    '🎯 '+minha.pts+' pontos
-'+
-    '✅ '+minha.ex+' placares exatos
-'+
-    '📊 '+minha.pal+' palpites feitos
-
-'+
-    'Participe você também!';
+  const nl='\n';
+  const txt='🏆 Bolão Copa 2026'+nl+nl+'👤 '+u.nome+nl+'🏅 '+pos+'º lugar de '+total+nl+'🎯 '+minha.pts+' pontos'+nl+'✅ '+minha.ex+' placares exatos'+nl+'📊 '+minha.pal+' palpites feitos'+nl+nl+'Participe você também!';
   if(navigator.share){navigator.share({title:'Bolão Copa 2026',text:txt}).catch(()=>{});}
 }
+
 function baixarComprovante(){
   const u=ST.usuario;
   const agora=new Date().toLocaleString("pt-BR");
