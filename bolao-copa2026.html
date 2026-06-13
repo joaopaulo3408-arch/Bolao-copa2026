@@ -7,7 +7,7 @@
 <title>Bolão Copa 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <!-- SUPABASE SDK -->h
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>h
 <style>
 :root{
   --bg:#04100a;--card:#0a1c10;--card2:#0d2214;
@@ -578,11 +578,13 @@ async function carregarMeusPalpites(){
   (data||[]).forEach(p=>{ST.meusPalpites[p.jogo_id]={m:p.gols_mandante,v:p.gols_visitante};});
 }
 async function carregarTodosPalpites(){
-  const{data}=await sb.from("palpites").select("*");
+  const resData=(await sb.from("resultados").select("jogo_id")).data||[];
+  const pastIds=resData.map(r=>r.jogo_id);
+  const{data}=pastIds.length>0?await sb.from("palpites").select("*").in("jogo_id",pastIds):{data:[]};
   ST.todosPalpites=data||[];
 }
 async function carregarParticipantes(){
-  const{data}=await sb.from("participantes").select("*").eq("status","ativo");
+  const{data}=await sb.from("participantes").select("id,nome,celular,status,criado_em").eq("status","ativo");
   ST.participantes=data||[];
 }
 async function carregarTudo(){
@@ -866,6 +868,7 @@ function adminAba(a){
   renderAdmin();
 }
 async function lancarRes(id){
+  if(!ST.usuario?.is_admin){toast("⛔ Acesso negado.",false);return;}
   const gm=document.getElementById("agm-"+id)?.value;
   const gv=document.getElementById("agv-"+id)?.value;
   if(gm===""||gv===""||gm==null||gv==null){toast("⚠ Preencha o resultado",false);return;}
@@ -877,6 +880,7 @@ async function lancarRes(id){
   toast("✓ Resultado lançado!");renderAdmin();
 }
 async function confirmarPag(pid){
+  if(!ST.usuario?.is_admin){toast("⛔ Acesso negado.",false);return;}
   loading(true);
   await sb.from("participantes").update({status:"ativo"}).eq("id",pid);
   await sb.from("pagamentos").update({status:"confirmado"}).eq("participante_id",pid);
@@ -886,6 +890,7 @@ async function confirmarPag(pid){
   renderAdmin();
 }
 async function recusarPag(pid){
+  if(!ST.usuario?.is_admin){toast("⛔ Acesso negado.",false);return;}
   loading(true);
   await sb.from("participantes").delete().eq("id",pid);
   await sb.from("pagamentos").delete().eq("participante_id",pid);
