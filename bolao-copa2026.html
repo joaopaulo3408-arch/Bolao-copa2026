@@ -377,12 +377,6 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   <div id="aba-ranking"  class="content fade" style="display:none;"></div>
   <div id="aba-todos"    class="content fade" style="display:none;"></div>
   <div id="aba-perfil"   class="content fade" style="display:none;"></div>
-  <nav class="bnav">
-    <button class="bnav-btn active" id="nav-palpites" onclick="goAba('palpites')"><span class="ico">⚽</span><span class="lbl">Palpites</span></button>
-    <button class="bnav-btn" id="nav-ranking" onclick="goAba('ranking')"><span class="ico">🏆</span><span class="lbl">Ranking</span></button>
-    <button class="bnav-btn" id="nav-todos" onclick="goAba('todos')"><span class="ico">👁</span><span class="lbl">Todos</span></button>
-    <button class="bnav-btn" id="nav-perfil" onclick="goAba('perfil')"><span class="ico">👤</span><span class="lbl">Perfil</span></button>
-  </nav>
 </div>
 
 <!-- ADMIN -->
@@ -1052,5 +1046,12 @@ carregarTudo = async function() {
   iniciarAutoRefresh();setTimeout(iniciarContagem,300);
 };
 </script>
+
+  <nav class="bnav">
+    <button class="bnav-btn active" id="nav-palpites" onclick="goAba('palpites')"><span class="ico">⚽</span><span class="lbl">Palpites</span></button>
+    <button class="bnav-btn" id="nav-ranking" onclick="goAba('ranking')"><span class="ico">🏆</span><span class="lbl">Ranking</span></button>
+    <button class="bnav-btn" id="nav-todos" onclick="goAba('todos')"><span class="ico">👁</span><span class="lbl">Todos</span></button>
+    <button class="bnav-btn" id="nav-perfil" onclick="goAba('perfil')"><span class="ico">👤</span><span class="lbl">Perfil</span></button>
+  </nav>
 </body>
 </html>
