@@ -591,8 +591,11 @@ async function carregarMeusPalpites(){
 }
 async function carregarTodosPalpites(){
   const resData=(await sb.from("resultados").select("jogo_id")).data||[];
-  const pastIds=resData.map(r=>r.jogo_id);
-  const{data}=pastIds.length>0?await sb.from("palpites").select("*").in("jogo_id",pastIds):{data:[]};
+  const encIds=resData.map(r=>r.jogo_id);
+  const agora=new Date();
+  const bloIds=JOGOS.filter(j=>new Date(j.dt)<=agora).map(j=>j.id);
+  const visIds=[...new Set([...encIds,...bloIds])];
+  const{data}=visIds.length>0?await sb.from("palpites").select("*").in("jogo_id",visIds):{data:[]};
   ST.todosPalpites=data||[];
 }
 async function carregarParticipantes(){
