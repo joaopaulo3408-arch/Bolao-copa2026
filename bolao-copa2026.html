@@ -52,7 +52,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 
 .fade{animation:fadeIn .25s ease both;}.hdr{position:sticky;top:0;z-index:100;background:rgba(4,16,10,.93);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;}.br-stripe{height:2.5px;border-radius:2px;display:block;}
 
-.bnav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(4,16,10,.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:7px 0 14px;}
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(4,16,10,.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:none;justify-content:space-around;padding:7px 0 14px;}
 .bnav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;border-radius:14px;border:none;background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .bnav-btn.active{background:rgba(34,160,80,.18);}
 .bnav-btn .ico{font-size:20px;line-height:1;}
@@ -567,7 +567,7 @@ function toast(msg,ok=true){
   setTimeout(()=>t.classList.remove("show"),2500);
 }
 function loading(show){document.getElementById("loading").classList.toggle("hide",!show);}
-function SS(s){document.querySelectorAll(".screen").forEach(e=>e.classList.remove("active"));document.getElementById("sc-"+s).classList.add("active");}
+function SS(s){document.querySelectorAll(".screen").forEach(e=>e.classList.remove("active"));document.getElementById("sc-"+s).classList.add("active");document.querySelector('.bnav').style.display=(s==='app')?'flex':'none';}
 
 // ══════════════════════════════
 // CARREGAR DADOS DO BANCO
