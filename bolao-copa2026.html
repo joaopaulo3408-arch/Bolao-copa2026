@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#04100a"/>
 <title>Bolão Copa 2026</title>h
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<!-- SUPABASE SDK -->
+<!-- SUPABASE SDK -->h
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -38,9 +38,9 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 
 /* LOADING */
 .loading { position : fixed ; inset : 0 ; background : var ( --bg ) ; display : flex ; flex-direction : column ; align-items : center ; justify - content : center ; z-index : 999 ; }
-. carregando . ocultar { exibir : nenhum ; }
+.loading.hide{display:none;}
 .spin { width : 40px ; height : 40px ; border : 3px solid rgba ( 46 , 204 , 113 , .2 ) ; border - top -color : var ( --gxl ) ; border - radius : 50 % ; animation : spin .8s linear infinite ; margin - bottom : 14px ; }     
-@keyframes  spin { para { transform : rotate ( 360 deg ) ; } }
+@keyframes  spin{to{ transform : rotate ( 360 deg ) ; } }
 @keyframes  pulse { 0 % , 100 % { opacity : 1 ; } 50 % { opacity : .4 ; } }
 @keyframes  fadeIn { from { opacity : 0 ; transform : translateY ( 8 px ) ; } to { opacity : 1 ; transform : none ; } }
 
