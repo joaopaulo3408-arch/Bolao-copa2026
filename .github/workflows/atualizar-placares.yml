@@ -18,6 +18,11 @@ jobs:
           python3 << 'PYEOF'
           import urllib.request, json, os, sys
           from datetime import datetime, timezone, timedelta
+          import unicodedata
+
+          def norm(s):
+              return unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
+
 
           FD_KEY = os.environ.get('FD_API_KEY', '')
           SB_URL = os.environ.get('SB_URL', '').rstrip('/')
@@ -105,6 +110,8 @@ jobs:
             "Jordan|Argentina": 72
           }
 
+          MAPA_NORMALIZADO = {norm(k): v for k, v in MAPA_JOGOS.items()}
+
           now = datetime.now(timezone.utc)
           date_from = (now - timedelta(days=1)).strftime('%Y-%m-%d')
           date_to = (now + timedelta(hours=3)).strftime('%Y-%m-%d')
@@ -142,9 +149,9 @@ jobs:
 
               home = match.get('homeTeam', {}).get('name', '')
               away = match.get('awayTeam', {}).get('name', '')
-              chave = f"{home}|{away}"
+              chave = f"{norm(home)}|{norm(away)}"
 
-              jogo_id = MAPA_JOGOS.get(chave)
+              jogo_id = MAPA_NORMALIZADO.get(chave)
               if not jogo_id:
                   print(f"  Jogo nao mapeado: {chave}")
                   continue
