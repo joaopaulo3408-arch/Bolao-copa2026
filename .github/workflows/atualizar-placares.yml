@@ -142,7 +142,7 @@ jobs:
                   data = json.loads(r.read())
           except Exception as e:
               print(f"ERRO ao buscar jogos: {e}")
-              sys.exit(1)
+                  sys.exit(1)
 
           matches = data.get('matches', [])
           print(f"Encontrados {len(matches)} jogos")
@@ -154,7 +154,7 @@ jobs:
                   continue
 
               score = match.get('score', {})
-                            if not score: continue
+              if not score: continue
               ft = score.get('fullTime', {})
               gm = ft.get('home')
               gv = ft.get('away')
