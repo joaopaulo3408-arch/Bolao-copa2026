@@ -21,166 +21,147 @@ jobs:
           import urllib.request, json, os, sys
           from datetime import datetime, timezone, timedelta
           import unicodedata
-
           def norm(s):
               return unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
-
-
           FD_KEY = os.environ.get('FD_API_KEY', '')
           SB_URL = os.environ.get('SB_URL', '').rstrip('/')
           SB_KEY = os.environ.get('SB_KEY', '')
-
           if not FD_KEY or not SB_URL or not SB_KEY:
               print("AVISO: Variaveis de ambiente nao configuradas.")
               sys.exit(0)
-
           MAPA_JOGOS = {
-            "Mexico|South Africa": 1,
-            "South Korea|Czechia": 2,
-            "Canada|Bosnia and Herzegovina": 3,
-            "United States|Paraguay": 4,
-            "Australia|Turkey": 5,
-            "Qatar|Switzerland": 6,
-            "Brazil|Morocco": 7,
-            "Haiti|Scotland": 8,
-            "Germany|Curacao": 9,
-            "Netherlands|Japan": 10,
-            "Ivory Coast|Ecuador": 11,
-            "Côte d'Ivoire|Ecuador": 11,
-            "Sweden|Tunisia": 12,
-            "Spain|Cape Verde": 13,
-            "Belgium|Egypt": 14,
-            "Saudi Arabia|Uruguay": 15,
-            "Iran|New Zealand": 16,
-            "Austria|Jordan": 17,
-            "France|Senegal": 18,
-            "Iraq|Norway": 19,
-            "Argentina|Algeria": 20,
-            "Portugal|Congo DR": 21,
-            "England|Croatia": 22,
-            "Ghana|Panama": 23,
-            "Uzbekistan|Colombia": 24,
-            "Czechia|South Africa": 25,
-            "Czech Republic|South Africa": 25,
-            "Switzerland|Bosnia and Herzegovina": 26,
-            "Canada|Qatar": 27,
-            "Mexico|South Korea": 28,
-            "Turkey|Paraguay": 29,
-            "United States|Australia": 30,
-            "Scotland|Morocco": 31,
-            "Brazil|Haiti": 32,
-            "Tunisia|Japan": 33,
-            "Netherlands|Sweden": 34,
-            "Germany|Ivory Coast": 35,
-            "Ecuador|Curacao": 36,
-            "Spain|Saudi Arabia": 37,
-            "Belgium|Iran": 38,
-            "Uruguay|Cape Verde": 39,
-            "New Zealand|Egypt": 40,
-            "Jordan|Algeria": 41,
-            "Argentina|Austria": 42,
-            "France|Iraq": 43,
-            "Norway|Senegal": 44,
-            "Portugal|Uzbekistan": 45,
-            "England|Ghana": 46,
-            "Panama|Croatia": 47,
-            "Colombia|Congo DR": 48,
-            "Switzerland|Canada": 49,
-            "Bosnia and Herzegovina|Qatar": 50,
-            "Scotland|Brazil": 51,
-            "Morocco|Haiti": 52,
-            "Czechia|Mexico": 53,
-            "Czech Republic|Mexico": 53,
-            "South Africa|South Korea": 54,
-            "Curacao|Ivory Coast": 55,
-            "Ecuador|Germany": 56,
-            "Japan|Sweden": 57,
-            "Tunisia|Netherlands": 58,
-            "Turkey|United States": 59,
-            "Paraguay|Australia": 60,
-            "Norway|France": 61,
-            "Senegal|Iraq": 62,
-            "Cape Verde|Saudi Arabia": 63,
-            "Uruguay|Spain": 64,
-            "Egypt|Iran": 65,
-            "New Zealand|Belgium": 66,
-            "Panama|England": 67,
-            "Croatia|Ghana": 68,
-            "Colombia|Portugal": 69,
-            "Congo DR|Uzbekistan": 70,
-            "Algeria|Austria": 71,
-            "Jordan|Argentina": 72,
-                        "Bosnia-Herzegovina|Qatar": 50,
-            "Bosnia-Herzegovina|Switzerland": 26,
-            "DR Congo|Uzbekistan": 70,
-            "DR Congo|Colombia": 48,
-            "Rep. of Korea|Czechia": 2,
-            "Republic of Korea|Czechia": 2,
-            "Korea Republic|Czechia": 2,
-            "Korea Republic|South Africa": 54,
-            "Korea Republic|Mexico": 28,
-            "USA|Paraguay": 4,
-            "USA|Australia": 30,
-            "USA|Turkey": 59,
-            "United States of America|Paraguay": 4,
+              "Mexico|South Africa": 1,
+              "South Korea|Czechia": 2,
+              "Canada|Bosnia and Herzegovina": 3,
+              "United States|Paraguay": 4,
+              "Australia|Turkey": 5,
+              "Qatar|Switzerland": 6,
+              "Brazil|Morocco": 7,
+              "Haiti|Scotland": 8,
+              "Germany|Curacao": 9,
+              "Netherlands|Japan": 10,
+              "Ivory Coast|Ecuador": 11,
+              "Cote d'Ivoire|Ecuador": 11,
+              "Sweden|Tunisia": 12,
+              "Spain|Cape Verde": 13,
+              "Belgium|Egypt": 14,
+              "Saudi Arabia|Uruguay": 15,
+              "Iran|New Zealand": 16,
+              "Austria|Jordan": 17,
+              "France|Senegal": 18,
+              "Iraq|Norway": 19,
+              "Argentina|Algeria": 20,
+              "Portugal|Congo DR": 21,
+              "England|Croatia": 22,
+              "Ghana|Panama": 23,
+              "Uzbekistan|Colombia": 24,
+              "Czechia|South Africa": 25,
+              "Czech Republic|South Africa": 25,
+              "Switzerland|Bosnia and Herzegovina": 26,
+              "Canada|Qatar": 27,
+              "Mexico|South Korea": 28,
+              "Turkey|Paraguay": 29,
+              "United States|Australia": 30,
+              "Scotland|Morocco": 31,
+              "Brazil|Haiti": 32,
+              "Tunisia|Japan": 33,
+              "Netherlands|Sweden": 34,
+              "Germany|Ivory Coast": 35,
+              "Ecuador|Curacao": 36,
+              "Spain|Saudi Arabia": 37,
+              "Belgium|Iran": 38,
+              "Uruguay|Cape Verde": 39,
+              "New Zealand|Egypt": 40,
+              "Jordan|Algeria": 41,
+              "Argentina|Austria": 42,
+              "France|Iraq": 43,
+              "Norway|Senegal": 44,
+              "Portugal|Uzbekistan": 45,
+              "England|Ghana": 46,
+              "Panama|Croatia": 47,
+              "Colombia|Congo DR": 48,
+              "Switzerland|Canada": 49,
+              "Bosnia and Herzegovina|Qatar": 50,
+              "Scotland|Brazil": 51,
+              "Morocco|Haiti": 52,
+              "Czechia|Mexico": 53,
+              "Czech Republic|Mexico": 53,
+              "South Africa|South Korea": 54,
+              "Curacao|Ivory Coast": 55,
+              "Ecuador|Germany": 56,
+              "Japan|Sweden": 57,
+              "Tunisia|Netherlands": 58,
+              "Turkey|United States": 59,
+              "Paraguay|Australia": 60,
+              "Norway|France": 61,
+              "Senegal|Iraq": 62,
+              "Cape Verde|Saudi Arabia": 63,
+              "Uruguay|Spain": 64,
+              "Egypt|Iran": 65,
+              "New Zealand|Belgium": 66,
+              "Panama|England": 67,
+              "Croatia|Ghana": 68,
+              "Colombia|Portugal": 69,
+              "Congo DR|Uzbekistan": 70,
+              "Algeria|Austria": 71,
+              "Jordan|Argentina": 72,
+              "Bosnia-Herzegovina|Qatar": 50,
+              "Bosnia-Herzegovina|Switzerland": 26,
+              "DR Congo|Uzbekistan": 70,
+              "DR Congo|Colombia": 48,
+              "Rep. of Korea|Czechia": 2,
+              "Republic of Korea|Czechia": 2,
+              "Korea Republic|Czechia": 2,
+              "Korea Republic|South Africa": 54,
+              "Korea Republic|Mexico": 28,
+              "USA|Paraguay": 4,
+              "USA|Australia": 30,
+              "USA|Turkey": 59
           }
-
           MAPA_NORMALIZADO = {norm(k): v for k, v in MAPA_JOGOS.items()}
-
           now = datetime.now(timezone.utc)
           date_from = (now - timedelta(days=1)).strftime('%Y-%m-%d')
           date_to = (now + timedelta(days=1)).strftime('%Y-%m-%d')
-
           url = (
               f"https://api.football-data.org/v4/competitions/WC/matches"
               f"?dateFrom={date_from}&dateTo={date_to}&status=FINISHED"
           )
           req = urllib.request.Request(url, headers={"X-Auth-Token": FD_KEY})
-
           try:
               with urllib.request.urlopen(req, timeout=15) as r:
                   data = json.loads(r.read())
           except Exception as e:
               print(f"ERRO ao buscar jogos: {e}")
-                  sys.exit(1)
-
+              sys.exit(1)
           matches = data.get('matches', [])
           print(f"Encontrados {len(matches)} jogos")
-
           atualizados = 0
           for match in matches:
               status = match.get('status', '')
               if status != 'FINISHED':
                   continue
-
-              score = match.get('score', {})
-              if not score: continue
-              ft = score.get('fullTime', {})
+              score = match.get('score') or {}
+              if not score:
+                  continue
+              ft = score.get('fullTime') or {}
               gm = ft.get('home')
               gv = ft.get('away')
-
               if gm is None or gv is None:
                   continue
-
               home = match.get('homeTeam', {}).get('name', '')
               away = match.get('awayTeam', {}).get('name', '')
               chave = f"{norm(home)}|{norm(away)}"
-
               jogo_id = MAPA_NORMALIZADO.get(chave)
               if not jogo_id:
                   print(f"  Jogo nao mapeado: {chave}")
                   continue
-
               print(f"  Atualizando jogo {jogo_id}: {home} {gm}x{gv} {away} ({status})")
-
               payload = json.dumps({
                   "jogo_id": jogo_id,
                   "gols_mandante": gm,
                   "gols_visitante": gv
               }).encode()
-
               upsert_url = f"{SB_URL}/rest/v1/resultados"
-
               req2 = urllib.request.Request(
                   upsert_url,
                   data=payload,
@@ -220,6 +201,5 @@ jobs:
                       print(f"  ERRO ao atualizar: {e}")
               except Exception as e:
                   print(f"  ERRO ao atualizar: {e}")
-
           print(f"Concluido! {atualizados} resultados atualizados.")
           PYEOF
