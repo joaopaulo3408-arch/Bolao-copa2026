@@ -39,6 +39,7 @@ jobs:
             "Germany|Curacao": 9,
             "Netherlands|Japan": 10,
             "Ivory Coast|Ecuador": 11,
+            "Côte d'Ivoire|Ecuador": 11,
             "Sweden|Tunisia": 12,
             "Spain|Cape Verde": 13,
             "Belgium|Egypt": 14,
