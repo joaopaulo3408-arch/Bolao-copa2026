@@ -110,13 +110,26 @@ jobs:
             "Congo DR|Uzbekistan": 70,
             "Algeria|Austria": 71,
             "Jordan|Argentina": 72
+                        "Bosnia-Herzegovina|Qatar": 50,
+            "Bosnia-Herzegovina|Switzerland": 26,
+            "DR Congo|Uzbekistan": 70,
+            "DR Congo|Colombia": 48,
+            "Rep. of Korea|Czechia": 2,
+            "Republic of Korea|Czechia": 2,
+            "Korea Republic|Czechia": 2,
+            "Korea Republic|South Africa": 54,
+            "Korea Republic|Mexico": 28,
+            "USA|Paraguay": 4,
+            "USA|Australia": 30,
+            "USA|Turkey": 59,
+            "United States of America|Paraguay": 4,
           }
 
           MAPA_NORMALIZADO = {norm(k): v for k, v in MAPA_JOGOS.items()}
 
           now = datetime.now(timezone.utc)
           date_from = (now - timedelta(days=1)).strftime('%Y-%m-%d')
-          date_to = (now + timedelta(hours=3)).strftime('%Y-%m-%d')
+          date_to = (now + timedelta(days=1)).strftime('%Y-%m-%d')
 
           url = (
               f"https://api.football-data.org/v4/competitions/WC/matches"
@@ -141,8 +154,8 @@ jobs:
                   continue
 
               score = match.get('score', {})
+                            if not score: continue
               ft = score.get('fullTime', {})
-              ht = score.get('halfTime', {})
               gm = ft.get('home')
               gv = ft.get('away')
 
