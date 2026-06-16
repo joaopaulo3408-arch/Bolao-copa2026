@@ -526,7 +526,7 @@ function ini(n){return(n||"?").split(" ").map(w=>w[0]).slice(0,2).join("").toUpp
 function calcPts(pm,pv,gm,gv){
   pm=+pm;pv=+pv;
   if(isNaN(pm)||isNaN(pv)||gm==null||gv==null)return null;
-  if(pm===gm&&pv===gv)return 10;
+  if(pm===gm&&pv===gv)return 10;h
   const dp=pm-pv,dg=gm-gv;
   if(dp>0&&dg>0)return dp===dg?7:5;
   if(dp<0&&dg<0)return dp===dg?7:5;
@@ -1037,7 +1037,7 @@ function iniciarAutoRefresh() {
         else if (abaAtual.textContent.trim().includes("Todos")) renderTodos();
       }
     }
-  }, 60000);
+  }, 300000);
 }
 // Start auto-refresh when user logs in
 var _origCarregarTudo = carregarTudo;
