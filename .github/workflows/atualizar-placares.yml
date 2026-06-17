@@ -152,6 +152,13 @@ jobs:
               away = match.get('awayTeam', {}).get('name', '')
               chave = f"{norm(home)}|{norm(away)}"
               jogo_id = MAPA_NORMALIZADO.get(chave)
+              jdt=match.get('utcDate','')
+              if jdt:
+                  try:
+                      _jdt=datetime.fromisoformat(jdt.replace('Z','+00:00'))
+                      if _jdt>now:
+                          print(f'  Futuro ignorado: {home} vs {away}'); continue
+                  except: pass
               if not jogo_id:
                   print(f"  Jogo nao mapeado: {chave}")
                   continue
