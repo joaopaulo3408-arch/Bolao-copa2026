@@ -1027,8 +1027,6 @@ var _refreshInterval = null;
 function iniciarAutoRefresh() {
   if (_refreshInterval) clearInterval(_refreshInterval);
   _refreshInterval = setInterval(async function() {
-    var temJogoAtivo = JOGOS.some(function(j) { return stJ(j) === "blo"; });
-    if (temJogoAtivo) {
       await carregarTudo();
       var abaAtual = document.querySelector(".aba-btn.active");
       if (abaAtual) {
@@ -1036,7 +1034,6 @@ function iniciarAutoRefresh() {
         else if (abaAtual.textContent.trim().includes("Ranking")) renderRanking();
         else if (abaAtual.textContent.trim().includes("Todos")) renderTodos();
       }
-    }
   }, 300000);
 }
 // Start auto-refresh when user logs in
