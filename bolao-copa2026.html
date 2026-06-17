@@ -535,8 +535,10 @@ function calcPts(pm,pv,gm,gv){
 }
 function stJ(j){
   const res=ST.resultados[j.id];
-  if(res)return"enc";
-  return new Date()>=new Date(j.dt)?"blo":"abe";
+  const passou=new Date()>=new Date(j.dt);
+  if(res&&passou)return"enc";
+  if(passou)return"blo";
+  return"abe";
 }
 function fmtDt(dt){return new Date(dt).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});}
 function fmtDia(dt){return new Date(dt).toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"short"});}
@@ -575,7 +577,12 @@ function SS(s){document.querySelectorAll(".screen").forEach(e=>e.classList.remov
 async function carregarResultados(){
   const{data}=await sb.from("resultados").select("*");
   ST.resultados={};
-  (data||[]).forEach(r=>{ST.resultados[r.jogo_id]={gm:r.gols_mandante,gv:r.gols_visitante};});
+  const agora=new Date();
+  (data||[]).forEach(r=>{
+    const jogo=JOGOS.find(j=>j.id===r.jogo_id);
+    if(jogo&&agora<new Date(jogo.dt))return;
+    ST.resultados[r.jogo_id]={gm:r.gols_mandante,gv:r.gols_visitante};
+  });
 }
 async function carregarMeusPalpites(){
   if(!ST.usuario?.id)return;
