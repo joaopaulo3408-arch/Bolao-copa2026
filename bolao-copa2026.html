@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="Bolão 2026"/>
   <meta name="theme-color" content="#04100a"/>
 <title>Bolão Copa 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&familyh=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <!-- SUPABASE SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -840,16 +840,22 @@ function renderTodos(){
 
 
       if(palpsJogo.length>0){const total=palpsJogo.length;const vitM=palpsJogo.filter(p=>p.gols_mandante>p.gols_visitante).length;const emp=palpsJogo.filter(p=>p.gols_mandante===p.gols_visitante).length;const vitV=palpsJogo.filter(p=>p.gols_mandante<p.gols_visitante).length;const pctM=Math.round(vitM/total*100);const pctE=Math.round(emp/total*100);const pctV=Math.round(vitV/total*100);h+=`<div style="margin:6px 0 10px;font-size:10px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap;"><span style="color:var(--white);font-weight:700;">${flag(j.m)} ${pctM}%</span><div class="vs-bar" style="flex:1;min-width:30px;"><div class="vs-fill" style="width:${pctM}%;"></div></div><span>${pctE}% emp.</span><div class="vs-bar" style="flex:1;min-width:30px;"><div class="vs-fill" style="width:${pctV}%;background:#4fc3f7;"></div></div><span style="color:var(--white);font-weight:700;">${pctV}% ${flag(j.v)}</span></div>`;}
-      ST.participantes.forEach(p=>{
+            const rankingTodos=calcularRanking();
+ST.participantes.forEach(p=>{
         const pal=palpsJogo.find(x=>x.participante_id===p.id);
         const isMe=p.id===ST.usuario?.id;
         if(!pal){
           h+=`<div class="palp-item row-between"><div class="fw7 fs12" style="color:${isMe?"var(--gxl)":"var(--white)"};">${p.nome}${isMe?" (você)":""}</div><span class="txt-muted fs12">Não palpitou</span></div>`;
         } else {
           const pts=res?calcPts(pal.gols_mandante,pal.gols_visitante,res.gm,res.gv):null;
+          const pStats=rankingTodos.find(r=>r.id===p.id)||{};
           h+=`<div class="palp-item">
             <div class="fw7 fs12" style="color:${isMe?"var(--gxl)":"var(--white)"};">${p.nome}${isMe?" (você)":""}</div>
             <div class="row-between"><span class="txt-white fs13 fw7">${pal.gols_mandante} × ${pal.gols_visitante}</span>${pts!==null?ptsBadge(pts):`<span class="txt-muted fs11">aguardando</span>`}</div>
+            <div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap;">${pStats.ex!==undefined?`<span style="background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.35);border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;color:#f5c518;">🎯 ${pStats.ex||0} exatos</span>`:""}
+            ${pStats.pal!==undefined?`<span style="background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.3);border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;color:#2ecc71;">✅ ${pStats.pal||0} palpites</span>`:""}
+            ${pStats.maxStreak!==undefined?`<span style="background:rgba(255,152,0,.12);border:1px solid rgba(255,152,0,.3);border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;color:#ff9800;">🔥 ${pStats.maxStreak||0} seq.</span>`:""}
+            </div>
           </div>`;
         }
       });
