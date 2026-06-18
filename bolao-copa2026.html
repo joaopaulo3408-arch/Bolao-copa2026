@@ -277,6 +277,10 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         </div>
       </div>
       <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:12px;">
+        <div style="font-weight:700;margin-bottom:4px;">🔢 Critério de Desempate</div>
+        <div style="font-size:13px;color:var(--white);opacity:.85;">Em caso de empate em pontos, o desempate é feito pela seguinte ordem: 1º maior número de placares exatos, 2º maior número de acertos (vencedor/empate correto), 3º maior sequência de acertos consecutivos.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:12px;">
         <div class="fw7 txt-white fs13" style="margin-bottom:4px;">🏆 Premiação</div>
         <div class="txt-muted fs12"><strong class="txt-gold">1º lugar — 60%</strong><br/><strong style="color:#c0c0c0;">2º lugar — 25%</strong><br/><strong style="color:#cd7f32;">3º lugar — 15%</strong></div>
       </div>
@@ -627,7 +631,7 @@ function calcularRanking(){
       if((rank[pal.participante_id]._cur||0)>(rank[pal.participante_id].maxStreak||0)){rank[pal.participante_id].maxStreak=rank[pal.participante_id]._cur;}
     }
   });
-  return Object.values(rank).sort((a,b)=>b.pts-a.pts);
+  return Object.values(rank).sort((a,b)=>b.pts-a.pts||b.ex-a.ex||b.pal-a.pal||b.maxStreak-a.maxStreak);
 }
 
 // ══════════════════════════════
