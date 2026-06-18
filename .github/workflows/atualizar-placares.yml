@@ -145,7 +145,7 @@ jobs:
           except Exception as _ex: print(f"Limpeza skipped: {_ex}")
           for match in matches:
               status = match.get('status', '')
-              if status not in ('FINISHED', 'IN_PLAY', 'PAUSED'):
+              if status != 'FINISHED':
                   continue
               score = match.get('score') or {}
               if not score:
