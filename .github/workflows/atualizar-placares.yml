@@ -124,7 +124,7 @@ jobs:
           date_to = (now + timedelta(days=1)).strftime('%Y-%m-%d')
           url = (
               f"https://api.football-data.org/v4/competitions/WC/matches"
-              f"?dateFrom={date_from}&dateTo={date_to}&status=FINISHED"
+              f"?dateFrom={date_from}&dateTo={date_to}&status=IN_PLAY,PAUSED,FINISHED"
           )
           req = urllib.request.Request(url, headers={"X-Auth-Token": FD_KEY})
           try:
@@ -144,7 +144,7 @@ jobs:
           except Exception as _ex: print(f"Limpeza skipped: {_ex}")
           for match in matches:
               status = match.get('status', '')
-              if status != 'FINISHED':
+              if status not in ('FINISHED', 'IN_PLAY', 'PAUSED'):
                   continue
               score = match.get('score') or {}
               if not score:
