@@ -998,7 +998,7 @@ async function renderAdmin(){
           <input id="agm-${j.id}" type="number" min="0" max="20" placeholder="0" class="inp-num-sm"/>
           <span class="txt-muted fw7">×</span>
           <input id="agv-${j.id}" type="number" min="0" max="20" placeholder="0" class="inp-num-sm"/>
-          <button onclick="lancarRes(${j.id})" style="flex:1;background:rgba(220,50,50,.2);border:1px solid rgba(220,50,50,.35);color:#ff6b6b;font-weight:700;padding:11px;border-radius:12px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;">Lançar</button>
+          <button onclick="lancarRes(${j.id})" style="flex:1;background:rgba(220,50,50,.2);border:1px solid rgba(220,50,50,.35);color:#ff6b6b;font-weight:700;padding:11px;border-radius:12px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;">${res?'✏️ Editar':'⚽ Lançar'}</button>
         </div>`:`<div class="txt-green fw7 fs13">✓ Resultado: ${res.gm} × ${res.gv}</div>`}
       </div>`;
     }).join("")}`;
