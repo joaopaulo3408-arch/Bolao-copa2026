@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#04100a"/>
 <title>Bolão Copa 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&familyh=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<!-- SUPABASE SDK -->h
+<!-- SUPABASE SDK -->hh
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -976,10 +976,10 @@ async function renderAdmin(){
 
   if(a==="jogos"){
     await carregarResultados();
-    const jgs=ST.adminFG==="todos"?JOGOS:JOGOS.filter(j=>j.g===ST.adminFG);
+    const jgs=ST.adminFG==="pendentes"?JOGOS.filter(j=>new Date(j.dt)<new Date()&&!ST.resultados[j.id]).sort((a,b)=>new Date(a.dt)-new Date(b.dt)):ST.adminFG==="todos"?[...JOGOS].sort((a,b)=>new Date(a.dt)-new Date(b.dt)):JOGOS.filter(j=>j.g===ST.adminFG);
     el.innerHTML=`
     <div class="filters mb12">
-      ${["todos",...Object.keys(GRUPOS)].map(g=>`<button class="filt-btn filt-g${ST.adminFG===g?" active":""}" onclick="setAdminFG('${g}')">${g==="todos"?"Todos":g}</button>`).join("")}
+      ${["todos","pendentes",...Object.keys(GRUPOS)].map(g=>`<button class='filt-btn filt-g${ST.adminFG===g?" active":""}'  onclick="setAdminFG('${g}')">${g==="todos"?"Todos":g==="pendentes"?"⏳ Pendentes":g}</button>`).join("")}
     </div>
     ${jgs.map(j=>{
       const res=ST.resultados[j.id];
@@ -999,7 +999,13 @@ async function renderAdmin(){
           <span class="txt-muted fw7">×</span>
           <input id="agv-${j.id}" type="number" min="0" max="20" placeholder="0" class="inp-num-sm"/>
           <button onclick="lancarRes(${j.id})" style="flex:1;background:rgba(220,50,50,.2);border:1px solid rgba(220,50,50,.35);color:#ff6b6b;font-weight:700;padding:11px;border-radius:12px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;">${res?'✏️ Editar':'⚽ Lançar'}</button>
-        </div>`:`<div class="txt-green fw7 fs13">✓ Resultado: ${res.gm} × ${res.gv}</div>`}
+        </div>`:`
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input id="agm-${j.id}" type="number" min="0" max="20" placeholder="0" class="inp-num-sm" value="${res.gm}" />
+          <span class="txt-muted fw7">×</span>
+          <input id="agv-${j.id}" type="number" min="0" max="20" placeholder="0" class="inp-num-sm" value="${res.gv}" />
+          <button onclick="lancarRes(${j.id})" style="flex:1;background:rgba(220,50,50,.2);border:1px solid rgba(220,50,50,.35);color:#ff6b6b;font-weight:700;padding:11px;border-radius:12px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;">${res?'✏️ Editar':'⚽ Lançar'}</button>
+        </div><div class="txt-green fw7 fs13">✓ Resultado: ${res.gm} × ${res.gv}</div>`}
       </div>`;
     }).join("")}`;
   }
