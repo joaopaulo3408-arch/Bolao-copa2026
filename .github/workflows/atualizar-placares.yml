@@ -137,12 +137,11 @@ jobs:
           matches = data.get('matches', [])
           print(f"Encontrados {len(matches)} jogos")
           atualizados = 0
-          # Limpar resultado incorreto do jogo 17 (Austria x Jordania gravado antes do jogo)
-          try:
-              _dr=urllib.request.Request(f"{SB_URL}/rest/v1/resultados?jogo_id=eq.17",headers={"apikey":SB_KEY,"Authorization":f"Bearer {SB_KEY}"},method="DELETE")
-              with urllib.request.urlopen(_dr,timeout=10) as _r: _r.read()
-              print("Limpeza: removido resultado invalido do jogo 17")
-          except Exception as _ex: print(f"Limpeza skipped: {_ex}")
+          # Resultados fixos: jogos ja finalizados cujo resultado da API esta errado
+          # Formato: {jogo_id: (gols_mandante, gols_visitante)}
+          RESULTADOS_FIXOS = {
+              17: (3, 1),  # Austria 3 x 1 Jordan
+          }
           for match in matches:
               status = match.get('status', '')
               if status != 'FINISHED':
@@ -169,6 +168,10 @@ jobs:
               if not jogo_id:
                   print(f"  Jogo nao mapeado: {chave}")
                   continue
+              # Se o jogo tem resultado fixo, usar esse em vez do da API
+              if jogo_id in RESULTADOS_FIXOS:
+                  gm, gv = RESULTADOS_FIXOS[jogo_id]
+                  print(f"  Usando resultado fixo para jogo {jogo_id}: {gm}x{gv}")
               print(f"  Atualizando jogo {jogo_id}: {home} {gm}x{gv} {away} ({status})")
               payload = json.dumps({
                   "jogo_id": jogo_id,
