@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#04100a"/>
 <title>Bolão Copa 2026</title>h
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&familyh=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<!-- SUPABASE SDK -->hh
+<!-- SUPABASE SDK -->hhh
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -591,9 +591,16 @@ async function carregarResultados(){
 }
 async function carregarMeusPalpites(){
   if(!ST.usuario?.id)return;
-  const{data}=await sb.from("palpites").select("*").eq("participante_id",ST.usuario.id);
+  let todos=[],from=0,pageSize=1000;
+  while(true){
+    const{data,error}=await sb.from("palpites").select("*").eq("participante_id",ST.usuario.id).range(from,from+pageSize-1);
+    if(error||!data||data.length===0)break;
+    todos=todos.concat(data);
+    if(data.length<pageSize)break;
+    from+=pageSize;
+  }
   ST.meusPalpites={};
-  (data||[]).forEach(p=>{ST.meusPalpites[p.jogo_id]={m:p.gols_mandante,v:p.gols_visitante};});
+  todos.forEach(p=>{ST.meusPalpites[p.jogo_id]={m:p.gols_mandante,v:p.gols_visitante};});
 }
 async function carregarTodosPalpites(){
   const resData=(await sb.from("resultados").select("jogo_id")).data||[];
@@ -601,8 +608,16 @@ async function carregarTodosPalpites(){
   const agora=new Date();
   const bloIds=JOGOS.filter(j=>new Date(j.dt)<=agora).map(j=>j.id);
   const visIds=[...new Set([...encIds,...bloIds])];
-  const{data}=visIds.length>0?await sb.from("palpites").select("*").in("jogo_id",visIds):{data:[]};
-  ST.todosPalpites=data||[];
+  if(!visIds.length){ST.todosPalpites=[];return;}
+  let todos=[],from=0,pageSize=1000;
+  while(true){
+    const{data,error}=await sb.from("palpites").select("*").in("jogo_id",visIds).range(from,from+pageSize-1);
+    if(error||!data||data.length===0)break;
+    todos=todos.concat(data);
+    if(data.length<pageSize)break;
+    from+=pageSize;
+  }
+  ST.todosPalpites=todos;
 }
 async function carregarParticipantes(){
   const{data}=await sb.from("participantes").select("id,nome,celular,status,criado_em").eq("status","ativo");
